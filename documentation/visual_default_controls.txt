@@ -1,0 +1,68 @@
+```text
+			 (   )          )  (          (   )          )  (          (   )
+			) ) ( (        (   ) )       ) ) ( (        (   ) )       ) ) ( (
+		   ( (   ) )        ) ( (       ( (   ) )        ) ( (       ( (   ) )
+		  .███▄ ▄███.      .███▄ ▄███. .███▄ ▄███.      .███▄ ▄███. .███▄ ▄███.
+		▄█████████████▄  ▄█████████████▄ ██████████▄  ▄█████████████▄ ██████████▄
+		███▀▀     ▀▀███  ███▀▀     ▀▀███ ███▀▀   ▀▀██ ███▀▀     ▀▀███ ███▀▀   ▀▀██
+		███  ( H )  ███  ███  ( E )  ███ ███ ( X ) ██ ███  ( N )  ███ ███ (HAX) ██
+		███▄▄     ▄▄███  ███▄▄     ▄▄███ ███▄▄   ▄▄██ ███▄▄     ▄▄███ ███▄▄   ▄▄██
+		▀█████████████▀  ▀█████████████▀ ██████████▀  ▀█████████████▀ ██████████▀
+  ╔════════════════════════════════════════════════════════════════════════════════════╗
+  ║  [0x01] TARGET  :: HEX-N-HAX // 2.5D DARK-FANTASY ARENA FIGHTER                    ║
+  ║  [0x02] ENGINE  :: GODOT 4.7.2-STABLE // GL_COMPATIBILITY + JOLT PHYSICS           ║
+  ║  [0x03] SCHEMES :: controls_default_controller.json  &&  controls_default_mnk.json ║
+  ╚════════════════════════════════════════════════════════════════════════════════════╝
+
+		[ L2 : TRIGGER ]                                         [ R2 : TRIGGER ]
+	   ┌────────────────┐                                       ┌────────────────┐
+	   │     block      │                                       │ slot_6_ultimate│
+	   │ (Block / Guard)│                                       │   (Ultimate)   │
+	   └───────┬────────┘                                       └───────┬────────┘
+		[ L1 : BUMPER ]                                          [ R1 : BUMPER ]
+	   ┌───────┴────────┐                                       ┌───────┴────────┐
+	   │slot_4_recovery │                                       │ slot_5_special │
+	   │   (Recovery)   │                                       │   (Special)    │
+	   └───────┬────────┘                                       └───────┬────────┘
+			   │   [CREATE]       ╔═══════════════════╗       [OPTIONS] │
+		 .-----┴---(Select)-------╢  [  TOUCHPAD   ]  ╟-------(Start)---┴-----.
+		/          [Unassigned]   ║  Guide/Inventory  ║       [pause]          \
+	   /      .---.               ║  (Not Mapped Here)║  [Pause Game]    .---.  \
+	  /     .-| ▲ |-.             ╚═══════════════════╝                .-|(△)|-. \
+	 /     | ◄  +  ► |              // 0x48 0x45 0x58 //              | (□) (○) | \
+	|       '-| ▼ |-'                                                  '-|(×)|-'   |
+	|      [D-PAD MIRROR]           .---.         .---.              [FACE SLOTS]  |
+	|    ◄ move_left               /  L  \       /  R  \          (△) slot_2_heavy |
+	|    ► move_right             | (L3)  |     | (R3)  |         (□) slot_1_quick |
+	|    ▲/▼ aim_up/down           \     /       \     /          (○) slot_3_proj..|
+	|        .----------.           '---'         '---'           (×) jump         |
+	|       /   0xFF00   \        [L-STICK]     [R-STICK]                          |
+	|      /   /------\   \       move_left     aim_up / down                      |
+	 \    /   /        \   \      move_right    (Directional)                     /
+	  \  /   /          \   \     aim_up/down                                    /
+	   \/___/            \___\                                                  /
+							   \______________________________________________/
+									[ DUALSENSE-HEX // HARDWARE SCHEMATIC ]
+
+  ╔═════════════════════╤═══════════════════╤══════════════════════╤═══════════════════╗
+  ║ INPUTMAP ACTION     │ DISPLAY NAME      │ DUALSENSE (DEFAULT)  │ MNK (DEFAULT)     ║
+  ╠═════════════════════╪═══════════════════╪══════════════════════╪═══════════════════╣
+  ║ move_left           │ Move Left         │ Left Stick ◄ / D-◄   │ A                 ║
+  ║ move_right          │ Move Right        │ Left Stick ► / D-►   │ D                 ║
+  ║ aim_up              │ Aim Up            │ L/R Stick ▲  / D-▲   │ W                 ║
+  ║ aim_down            │ Aim Down          │ L/R Stick ▼  / D-▼   │ S                 ║
+  ║ jump                │ Jump              │ Cross (×)            │ Space             ║
+  ║ block               │ Block             │ L2 Trigger           │ Left Shift        ║
+  ║ slot_1_quick        │ Quick Attack      │ Square (□)           │ Mouse Left (LMB)  ║
+  ║ slot_2_heavy        │ Heavy Attack      │ Triangle (△)         │ Mouse Right (RMB) ║
+  ║ slot_3_projectile   │ Projectile        │ Circle (○)           │ Q                 ║
+  ║ slot_4_recovery     │ Recovery          │ L1 Bumper            │ E                 ║
+  ║ slot_5_special      │ Special           │ R1 Bumper            │ R                 ║
+  ║ slot_6_ultimate     │ Ultimate          │ R2 Trigger           │ F                 ║
+  ║ pause               │ Pause             │ Options (Start)      │ Escape            ║
+  ╟─────────────────────┼───────────────────┼──────────────────────┼───────────────────╢
+  ║ [unassigned]        │ Select / Utility  │ Create (Select)      │ Tab               ║
+  ║ [unassigned]        │ Guide / Inventory │ Touchpad Click       │ I / M             ║
+  ╚═════════════════════╧═══════════════════╧══════════════════════╧═══════════════════╝
+
+```

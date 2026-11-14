@@ -1,0 +1,39 @@
+﻿[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://debug/DebugOverlay.gd" id="1_dbg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.08, 0.09, 0.12, 0.82)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.35, 0.4, 0.52, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="DebugOverlay" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_dbg")
+
+[node name="DebugPanel" type="PanelContainer" parent="."]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 560.0
+offset_bottom = 190.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+
+[node name="MarginContainer" type="MarginContainer" parent="DebugPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="DebugLabel" type="Label" parent="DebugPanel/MarginContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "HEX-N-HAX SANDBOX DEBUG [F1: Hide | F2: Swap Class]"

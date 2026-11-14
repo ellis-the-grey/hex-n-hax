@@ -8,11 +8,21 @@
 
 config_version=5
 
+"ï»¿config_version"=5
+
 [application]
 
 config/name="hex n hax"
+run/main_scene="res://stages/TestArena.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[autoload]
+
+GameEvents="*res://autoload/GameEvents.gd"
+InputLoader="*res://autoload/InputLoader.gd"
+SessionManager="*res://autoload/SessionManager.gd"
+DebugOverlay="*res://debug/DebugOverlay.tscn"
 
 [display]
 
