@@ -5,12 +5,10 @@ res://
 │   └── SessionManager.gd      # Player slots, controller assignments, & local/online session state
 ├── config/
 │   └── controls/              # Steven-editable JSONs mapped directly to native Godot JoyButton/Key strings
-│       ├── xbox.json
-│       ├── dualshock4.json
-│       ├── dualsense5.json
-│       ├── steam_input.json
-│       ├── keyboard_mouse.json
-│       └── generic_gamepad.json
+│       ├── controls_default_controller.json
+│       ├── controls_custom_controller.json
+│       ├── controls_default_mnk.json
+│       ├── controls_custom_mnk.json
 ├── core/
 │   ├── MatchManager.gd        # Match flow state machine (Intro -> Fight -> Results)
 │   ├── CameraRig25D.gd        # 3D camera tracking Z=0 combat plane + dynamic zoom
