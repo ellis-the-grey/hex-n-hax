@@ -1,0 +1,19 @@
+# Godot 4 auto-generated cache and local user settings
+.godot/
+*.translation
+
+# Godot 4 mono / C# (just in case)
+.mono/
+data_*/
+mono_crash.*.json
+
+# Exported game builds
+builds/
+*.exe
+*.pck
+*.zip
+
+# Local telemetry dumps & OS junk
+telemetry/logs/
+.DS_Store
+Thumbs.db

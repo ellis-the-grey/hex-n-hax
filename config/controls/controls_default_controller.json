@@ -1,0 +1,15 @@
+{
+  "move_left": "JOY_AXIS_LEFT_X:-1.0",
+  "move_right": "JOY_AXIS_LEFT_X:1.0",
+  "aim_up": "JOY_AXIS_LEFT_Y:-1.0",
+  "aim_down": "JOY_AXIS_LEFT_Y:1.0",
+  "jump": "JOY_BUTTON_A",
+  "block": "JOY_AXIS_TRIGGER_LEFT",
+  "slot_1_quick": "JOY_BUTTON_X",
+  "slot_2_heavy": "JOY_BUTTON_Y",
+  "slot_3_projectile": "JOY_BUTTON_B",
+  "slot_4_recovery": "JOY_BUTTON_RIGHT_SHOULDER",
+  "slot_5_special": "JOY_BUTTON_LEFT_SHOULDER",
+  "slot_6_ultimate": "JOY_AXIS_TRIGGER_RIGHT",
+  "pause": "JOY_BUTTON_START"
+}

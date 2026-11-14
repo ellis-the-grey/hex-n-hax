@@ -42,7 +42,7 @@ res://
 │   ├── NetSession.gd          # Host/join handshake & peer connection state
 │   ├── FighterSync.gd         # MultiplayerSynchronizer wrapper for position, state, & inputs
 │   └── NetTestLobby.gd        # Standalone test scene for quiet background testing
-└── docs/
+└── documentation/
     ├── STEVEN_SANDBOX_GUIDE.md
     ├── CONTROLS_JSON_REFERENCE.md
     └── ARCHITECTURE_OVERVIEW.md

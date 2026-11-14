@@ -1,0 +1,15 @@
+{
+  "move_left": "KEY_A",
+  "move_right": "KEY_D",
+  "aim_up": "KEY_W",
+  "aim_down": "KEY_S",
+  "jump": "KEY_SPACE",
+  "block": "KEY_SHIFT",
+  "slot_1_quick": "MOUSE_BUTTON_LEFT",
+  "slot_2_heavy": "MOUSE_BUTTON_RIGHT",
+  "slot_3_projectile": "KEY_Q",
+  "slot_4_recovery": "KEY_E",
+  "slot_5_special": "KEY_R",
+  "slot_6_ultimate": "KEY_F",
+  "pause": "KEY_ESCAPE"
+}

@@ -1,8 +1,0 @@
-Key Additions Locked In
-Native Controls (config/controls/): JSON files use Godot's native JoyButton / JoyAxis / Key names directly (e.g., "JOY_BUTTON_A", "JOY_AXIS_LEFT_Y") loaded straight into InputMap at startup—no custom translation layer.
-
-6-Slot Loadout: Slots 1–4 run the symmetrical starter kit; Slots 5 (Character Special) and 6 (Character Ultimate) are wired into LoadoutData.tres, InputBuffer, and BattleHUD from day one with high-cooldown placeholders for Steven to invent wild mechanics.
-
-Swappable Combat & Block: CombatRules.gd isolates damage and knockback math so you can test standard HP vs. percentage scaling anytime, while FighterBase.gd includes a basic guard state ready to expand into parries or shield-breaks.
-
-Stealth Netcode (netcode/): Completely decoupled from local gameplay via SessionManager and GameEvents, letting you build and test online invites quietly behind the scenes.
