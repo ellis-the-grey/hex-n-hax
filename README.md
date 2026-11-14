@@ -1,5 +1,4 @@
 # hex-n-hax
-# Hex-n-Hax
 
 A 2.5D dark-fantasy melee and magic arena fighter built in **Godot 4** (GDScript). Designed around a decoupled, data-driven architecture so combat tuning, weapon properties, and character abilities can be created and balanced directly in the Godot Inspector without touching core physics or UI code.
 
