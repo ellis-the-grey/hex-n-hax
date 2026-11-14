@@ -1,0 +1,50 @@
+res://
+├── autoload/
+│   ├── GameEvents.gd          # Global signal bus (hit_landed, block_triggered, stock_lost, match_ended)
+│   ├── InputBuffer.gd         # Reads native Godot InputMap actions & buffers 6 move slots
+│   └── SessionManager.gd      # Player slots, controller assignments, & local/online session state
+├── config/
+│   └── controls/              # Steven-editable JSONs mapped directly to native Godot JoyButton/Key strings
+│       ├── xbox.json
+│       ├── dualshock4.json
+│       ├── dualsense5.json
+│       ├── steam_input.json
+│       ├── keyboard_mouse.json
+│       └── generic_gamepad.json
+├── core/
+│   ├── MatchManager.gd        # Match flow state machine (Intro -> Fight -> Results)
+│   ├── CameraRig25D.gd        # 3D camera tracking Z=0 combat plane + dynamic zoom
+│   └── CombatRules.gd         # Swappable HP + knockback math (starts with HP pools, ready for Smash %)
+├── fighters/
+│   ├── FighterBase.gd         # 3D CharacterBody3D clamped to Z=0, movement, knockback, & basic block state
+│   ├── MoveExecutor.gd        # Spawns hitboxes/projectiles from MoveData on exact frames
+│   ├── HitboxComponent.gd     # Active frame windows, damage, & knockback vector
+│   ├── HurtboxComponent.gd    # Team-aware damage/block receiver
+│   ├── resources/             # Inspector schemas for Steven
+│   │   ├── FighterStats.gd    # HP, walk/air speed, weight, fall speed, jump count, block reduction
+│   │   ├── MoveData.gd        # Startup/active/recovery frames, damage, knockback, cooldown, VFX
+│   │   └── LoadoutData.gd     # 6 slots: 1 Quick, 2 Heavy, 3 Projectile, 4 Recovery, 5 Special, 6 Ultimate
+│   ├── presets/               # Steven's live Inspector sandbox (.tres files)
+│   │   ├── archetypes/        # fighter.tres, wizard.tres, rogue.tres, ranger.tres
+│   │   └── moves/             # Baseline 1–4 moves + placeholder 5–6 Special/Ultimate templates
+│   └── visuals/               # 3D rigs, animations, & projectile/slash VFX
+├── stages/
+│   ├── StageBase.gd           # Z=0 geometry, blast zones, ledges, & spawn markers
+│   └── TestArena.tscn         # Graybox testing stage
+├── ui/
+│   └── BattleHUD.gd           # HP bars, cooldown icons (Slots 1–6), & stock counters
+├── debug/
+│   ├── DebugOverlay.gd        # On-screen frame data, state readout, & FPS/physics monitors
+│   ├── HitboxVisualizer.gd    # Live 3D wireframe hitboxes, hurtboxes, & block shields
+│   └── BalanceDebugDeck.gd    # Live in-game tuning sliders & frame-step controls
+├── telemetry/
+│   ├── TelemetryRecorder.gd   # Captures hit rates, DPS, knockback distances, & cooldown usage
+│   └── MatchExporter.gd       # Dumps match logs to JSON/CSV for balance analysis
+├── netcode/                   # Isolated online multiplayer sandbox (Godot MultiplayerAPI / ENet)
+│   ├── NetSession.gd          # Host/join handshake & peer connection state
+│   ├── FighterSync.gd         # MultiplayerSynchronizer wrapper for position, state, & inputs
+│   └── NetTestLobby.gd        # Standalone test scene for quiet background testing
+└── docs/
+    ├── STEVEN_SANDBOX_GUIDE.md
+    ├── CONTROLS_JSON_REFERENCE.md
+    └── ARCHITECTURE_OVERVIEW.md
