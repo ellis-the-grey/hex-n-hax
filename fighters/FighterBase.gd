@@ -1,14 +1,17 @@
-﻿extends CharacterBody3D
+extends CharacterBody3D
 ## ============================================================================
 ## FighterBase.gd (Core 2.5D Fighter Movement, Jump, Block & Archetype Loader)
 ## ============================================================================
 ## WHAT THIS SCRIPT DOES:
 ##   Controls the 3D character body on the flat Z = 0 fighting plane. Loads its
 ##   assigned ArchetypeData (.tres) file on spawn, applies colors and movement
-##   stats, and handles walking, double-jumping, blocking, and Slots 1-6.
+##   stats, and handles walking, double-jumping, blocking, and Slots 1-6
+##   (including the Slot 4 L1 Emote cycle and Slot 5 R1 Kick) while driving
+##   the Mixamo 3D character animator.
 ##
 ## CONNECTS TO:
 ##   - Reads data from: ArchetypeData.gd & FighterStats.gd
+##   - Drives visuals via: FighterAnimator.gd (Y Bot & X Bot + Mixamo FBXs)
 ##   - Reads controls from: Godot's InputMap (loaded by InputLoader.gd)
 ##   - Reads session info from: SessionManager.gd
 ##   - Broadcasts events to: GameEvents.gd
@@ -57,13 +60,13 @@ var current_hp: float = 100.0
 # Jumps remaining before touching the ground again.
 var jumps_remaining: int = 2
 
-# True while holding the Block button.
+# True while holding the Block button (L2).
 var is_blocking: bool = false
 
 # Horizontal facing direction (-1.0 = Left, +1.0 = Right).
 var facing_direction: float = 1.0
 
-# Label of the last move slot pressed (shown in DebugOverlay).
+# Label of the last move slot or emote pressed (shown in DebugOverlay).
 var last_move_triggered: String = "None"
 
 # Base capsule mesh color loaded from ArchetypeData.
@@ -74,12 +77,12 @@ var personal_material: StandardMaterial3D
 
 # Move names for Slots 1 through 6.
 var slot_move_names: Dictionary = {
-	1: "Quick Attack",
-	2: "Heavy Attack",
-	3: "Projectile",
-	4: "Recovery",
-	5: "Special",
-	6: "Ultimate"
+	1: "Quick Attack (Jab)",
+	2: "Heavy Attack (Elbow)",
+	3: "Projectile (Hook)",
+	4: "Recovery (Emote)",
+	5: "Special (Kick)",
+	6: "Ultimate (KO)"
 }
 
 # Cooldown durations (in seconds) for Slots 1 through 6.
@@ -92,18 +95,35 @@ var slot_cooldowns: Dictionary = {
 	6: 12.0
 }
 
+# Remaining cooldown timers (in seconds) for Slots 1 through 6.
+var slot_cooldown_timers: Dictionary = {
+	1: 0.0,
+	2: 0.0,
+	3: 0.0,
+	4: 0.0,
+	5: 0.0,
+	6: 0.0
+}
+
+# Tracks whether any input happened on the current physics frame.
+var _frame_had_input: bool = false
+
 # --- NODE REFERENCES ---------------------------------------------------------
 
-# Reference to the 3D capsule MeshInstance3D.
+# Reference to the 3D torso capsule MeshInstance3D.
 @onready var body_mesh: MeshInstance3D = get_node_or_null("BodyMesh")
+
+# Reference to the Mixamo model loader and animation controller.
+var animator: FighterAnimator = null
 
 # --- LIFECYCLE FUNCTIONS -----------------------------------------------------
 
-# Initializes material, loads the active archetype preset, and locks Z = 0.
+# Initializes torso material, creates the animator, loads the archetype, and locks Z = 0.
 # Parameters: None
 # Returns: Nothing (void)
 func _ready() -> void:
 	_setup_personal_mesh_material()
+	_setup_animator_node()
 
 	if archetype_preset != null:
 		apply_archetype_data(archetype_preset)
@@ -114,12 +134,23 @@ func _ready() -> void:
 	global_position.z = 0.0
 	GameEvents.fighter_spawned.emit(player_id, archetype_name, self)
 
-# Runs every physics tick (60 Hz) to process movement, jumps, block, and move inputs.
+# Runs every physics tick (60 Hz) to process movement, jumps, block, slots, and animations.
 # Parameters:
 #   delta : Fixed timestep in seconds
 # Returns: Nothing (void)
 func _physics_process(delta: float) -> void:
+	_frame_had_input = false
+	_tick_slot_cooldowns(delta)
 	_apply_gravity_and_floor_check(delta)
+
+	# If knocked out by Slot 6, lock movement until respawned.
+	if animator != null and animator.is_knocked_out:
+		velocity.x = 0.0
+		move_and_slide()
+		global_position.z = 0.0
+		velocity.z = 0.0
+		return
+
 	_handle_block_input()
 	_handle_jump_input()
 	_handle_horizontal_movement()
@@ -131,7 +162,28 @@ func _physics_process(delta: float) -> void:
 	global_position.z = 0.0
 	velocity.z = 0.0
 
-# --- ARCHETYPE PRESET LOADING FUNCTIONS --------------------------------------
+	# Update Mixamo model facing direction and animation state.
+	if animator != null:
+		animator.update_locomotion(
+			delta,
+			is_on_floor(),
+			velocity,
+			is_blocking,
+			facing_direction,
+			_frame_had_input
+		)
+
+# --- ANIMATOR & ARCHETYPE PRESET LOADING FUNCTIONS ---------------------------
+
+# Creates and attaches the FighterAnimator child node if not already present.
+# Parameters: None
+# Returns: Nothing (void)
+func _setup_animator_node() -> void:
+	animator = get_node_or_null("FighterAnimator") as FighterAnimator
+	if animator == null:
+		animator = FighterAnimator.new()
+		animator.name = "FighterAnimator"
+		add_child(animator)
 
 # Loads an ArchetypeData .tres file by lowercase name from res://fighters/presets/archetypes/.
 # Parameters:
@@ -150,7 +202,7 @@ func load_archetype_by_name(target_archetype_id: String) -> void:
 		archetype_preset = loaded_resource
 		apply_archetype_data(archetype_preset)
 
-# Copies stats, colors, and move slot names from an ArchetypeData resource onto this fighter.
+# Copies stats, colors, move slot names, and spawns Y Bot or X Bot for this archetype.
 # Parameters:
 #   data : The ArchetypeData resource to apply
 # Returns: Nothing (void)
@@ -176,10 +228,23 @@ func apply_archetype_data(data: ArchetypeData) -> void:
 	for slot_num: int in range(1, 7):
 		slot_move_names[slot_num] = data.get_move_name(slot_num)
 		slot_cooldowns[slot_num] = data.get_move_cooldown(slot_num)
+		slot_cooldown_timers[slot_num] = 0.0
 
 	jumps_remaining = max_jumps
 
+	if animator != null:
+		animator.setup_for_archetype(self, data.archetype_id)
+
 # --- MOVEMENT & PHYSICS HELPER FUNCTIONS -------------------------------------
+
+# Counts down active cooldown timers on Slots 1 through 6 every frame.
+# Parameters:
+#   delta : Fixed timestep in seconds
+# Returns: Nothing (void)
+func _tick_slot_cooldowns(delta: float) -> void:
+	for slot_num: int in slot_cooldown_timers.keys():
+		if slot_cooldown_timers[slot_num] > 0.0:
+			slot_cooldown_timers[slot_num] = maxf(0.0, slot_cooldown_timers[slot_num] - delta)
 
 # Applies gravity in mid-air or resets jump count when standing on a floor.
 # Parameters:
@@ -191,11 +256,14 @@ func _apply_gravity_and_floor_check(delta: float) -> void:
 	else:
 		velocity.y -= gravity_strength * delta
 
-# Checks the Block button and updates mesh tint and GameEvents when toggled.
+# Checks the Block button (L2) and updates mesh tint and GameEvents when toggled.
 # Parameters: None
 # Returns: Nothing (void)
 func _handle_block_input() -> void:
 	var wants_to_block: bool = Input.is_action_pressed("block")
+	if wants_to_block:
+		_frame_had_input = true
+
 	if wants_to_block != is_blocking:
 		is_blocking = wants_to_block
 		_update_mesh_color()
@@ -209,10 +277,13 @@ func _handle_jump_input() -> void:
 		return
 
 	if Input.is_action_just_pressed("jump") and jumps_remaining > 0:
+		_frame_had_input = true
 		jumps_remaining -= 1
 		velocity.y = jump_velocity
+		if animator != null:
+			animator.trigger_jump_start()
 
-# Reads Left/Right input and applies horizontal velocity.
+# Reads Left/Right input and applies horizontal velocity and facing direction.
 # Parameters: None
 # Returns: Nothing (void)
 func _handle_horizontal_movement() -> void:
@@ -225,11 +296,12 @@ func _handle_horizontal_movement() -> void:
 	velocity.x = input_axis * current_speed
 
 	if absf(input_axis) > 0.1:
+		_frame_had_input = true
 		facing_direction = signf(input_axis)
 
-# --- ABILITY SLOT INPUT FUNCTIONS --------------------------------------------
+# --- ABILITY SLOT & EMOTE INPUT FUNCTIONS ------------------------------------
 
-# Checks for presses on Move Slots 1 through 6.
+# Checks for presses on Move Slots 1 through 6 via Godot's InputMap.
 # Parameters: None
 # Returns: Nothing (void)
 func _handle_move_slot_inputs() -> void:
@@ -243,24 +315,48 @@ func _handle_move_slot_inputs() -> void:
 	elif Input.is_action_just_pressed("slot_3_projectile"):
 		_trigger_move_slot(3)
 	elif Input.is_action_just_pressed("slot_4_recovery"):
-		_trigger_move_slot(4)
+		_trigger_emote_slot()
 	elif Input.is_action_just_pressed("slot_5_special"):
 		_trigger_move_slot(5)
 	elif Input.is_action_just_pressed("slot_6_ultimate"):
 		_trigger_move_slot(6)
 
-# Broadcasts the pressed move slot over GameEvents and logs the slot call.
+# Broadcasts the pressed move slot if off cooldown and triggers its Mixamo animation.
 # Parameters:
-#   slot_number : Move slot index (1 through 6)
+#   slot_number : Move slot index (1, 2, 3, 5, or 6)
 # Returns: Nothing (void)
 func _trigger_move_slot(slot_number: int) -> void:
+	_frame_had_input = true
+
+	var remaining_cd: float = float(slot_cooldown_timers.get(slot_number, 0.0))
+	if remaining_cd > 0.0:
+		return
+
 	var move_label: String = str(slot_move_names.get(slot_number, "Unknown Move"))
 	var cooldown_time: float = float(slot_cooldowns.get(slot_number, 1.0))
+	slot_cooldown_timers[slot_number] = cooldown_time
 
 	last_move_triggered = "Slot " + str(slot_number) + ": " + move_label
 
+	if animator != null:
+		animator.trigger_combat_slot(slot_number)
+
 	GameEvents.move_slot_pressed.emit(player_id, slot_number, move_label, cooldown_time)
 	print("[FighterBase] Player ", player_id, " (", archetype_name, ") used -> Slot ", slot_number, ": ", move_label)
+
+# Triggers the repeatable 4-emote cycle on Slot 4 (L1 / slot_4_recovery).
+# Parameters: None
+# Returns: Nothing (void)
+func _trigger_emote_slot() -> void:
+	_frame_had_input = true
+
+	if animator == null:
+		return
+
+	var emote_name: String = animator.trigger_next_emote()
+	last_move_triggered = "Slot 4 (L1 Emote): " + emote_name
+	GameEvents.move_slot_pressed.emit(player_id, 4, "Emote: " + emote_name, 0.0)
+	print("[FighterBase] Player ", player_id, " (", archetype_name, ") used -> Slot 4 (L1 Emote): ", emote_name)
 
 # --- VISUAL MATERIAL & RESPAWN HELPERS ---------------------------------------
 
@@ -286,7 +382,7 @@ func _update_mesh_color() -> void:
 	else:
 		personal_material.albedo_color = base_mesh_color
 
-# Teleports the fighter to a spawn coordinate and resets velocity, HP, and jumps.
+# Teleports the fighter to a spawn coordinate and resets velocity, HP, jumps, and KO state.
 # Parameters:
 #   spawn_position : Target 3D spawn position
 # Returns: Nothing (void)
@@ -296,4 +392,8 @@ func respawn_at(spawn_position: Vector3) -> void:
 	current_hp = max_hp
 	jumps_remaining = max_jumps
 	is_blocking = false
+	for slot_num: int in slot_cooldown_timers.keys():
+		slot_cooldown_timers[slot_num] = 0.0
 	_update_mesh_color()
+	if animator != null:
+		animator.reset_to_initial_idle()

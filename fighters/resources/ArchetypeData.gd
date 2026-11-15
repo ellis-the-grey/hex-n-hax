@@ -1,4 +1,4 @@
-﻿extends Resource
+extends Resource
 class_name ArchetypeData
 ## ============================================================================
 ## ArchetypeData.gd (Complete Character Class Blueprint)
@@ -26,7 +26,7 @@ class_name ArchetypeData
 # Plain-English description of the archetype.
 @export_multiline var description: String = "Placeholder description."
 
-# Color applied to the 3D capsule mesh in the arena.
+# Color applied to the 3D capsule mesh in the arena. gonna try to make it a real biped
 @export var mesh_color: Color = Color(0.85, 0.25, 0.25, 1.0)
 
 # --- PHYSICAL STATS SHEET ----------------------------------------------------

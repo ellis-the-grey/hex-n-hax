@@ -8,8 +8,8 @@
   "slot_1_quick": "JOY_BUTTON_X",
   "slot_2_heavy": "JOY_BUTTON_Y",
   "slot_3_projectile": "JOY_BUTTON_B",
-  "slot_4_recovery": "JOY_BUTTON_RIGHT_SHOULDER",
-  "slot_5_special": "JOY_BUTTON_LEFT_SHOULDER",
+  "slot_4_recovery": "JOY_BUTTON_LEFT_SHOULDER",
+  "slot_5_special": "JOY_BUTTON_RIGHT_SHOULDER",
   "slot_6_ultimate": "JOY_AXIS_TRIGGER_RIGHT",
   "pause": "JOY_BUTTON_START"
 }

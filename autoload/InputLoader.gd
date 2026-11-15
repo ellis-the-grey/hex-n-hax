@@ -1,10 +1,12 @@
-﻿extends Node
+extends Node
 ## ============================================================================
 ## InputLoader.gd (JSON Control Scheme Loader)
 ## ============================================================================
 ## WHAT THIS SCRIPT DOES:
 ##   Reads default and custom control layouts from res://config/controls/*.json
 ##   at startup and registers them into Godot's native InputMap.
+##   Also includes a temporary hardware bridge so Controller Create (Back)
+##   triggers Keyboard F1 and Controller Options (Start) triggers Keyboard F2.
 ##
 ## CONNECTS TO:
 ##   - Reads from: res://config/controls/*.json
@@ -72,6 +74,32 @@ const MOUSE_BUTTON_MAP: Dictionary = {
 # Returns: Nothing (void)
 func _ready() -> void:
 	reload_all_controls()
+
+# Temporary event bridge: maps Controller Create -> F1 and Options -> F2.
+# Parameters:
+#   event : Incoming hardware input event
+# Returns: Nothing (void)
+func _input(event: InputEvent) -> void:
+	if not (event is InputEventJoypadButton):
+		return
+
+	var joy_btn: InputEventJoypadButton = event as InputEventJoypadButton
+	if joy_btn.button_index == JOY_BUTTON_BACK:
+		_inject_key_event(KEY_F1, joy_btn.pressed)
+	elif joy_btn.button_index == JOY_BUTTON_START:
+		_inject_key_event(KEY_F2, joy_btn.pressed)
+
+# Synthesizes and dispatches a keyboard key event into Godot's input pipeline.
+# Parameters:
+#   target_key : Godot Key constant (KEY_F1 or KEY_F2)
+#   is_pressed : True when button is pressed down, false when released
+# Returns: Nothing (void)
+func _inject_key_event(target_key: Key, is_pressed: bool) -> void:
+	var key_event: InputEventKey = InputEventKey.new()
+	key_event.keycode = target_key
+	key_event.physical_keycode = target_key
+	key_event.pressed = is_pressed
+	Input.parse_input_event(key_event)
 
 # --- PUBLIC FUNCTIONS --------------------------------------------------------
 
